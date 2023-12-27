@@ -142,20 +142,17 @@ func (s Section) normalise(path string) []string {
 	if err != nil {
 		return []string{}
 	}
+	separators := []string{
+		",", ";", ".", ":", "/",
+		"\\", "|", "||"}
 	// try different separators
-	parts := strings.Split(contents, ",")
-	if len(parts) > 1 {
-		return parts
+	for _, sep := range separators {
+		parts := strings.Split(contents, sep)
+		if len(parts) > 1 {
+			return parts
+		}
 	}
-	parts = strings.Split(contents, ";")
-	if len(parts) > 1 {
-		return parts
-	}
-	parts = strings.Split(contents, "/")
-	if len(parts) > 1 {
-		return parts
-	}
-	parts = strings.Split(contents, "\n")
+	parts := strings.Split(contents, "\n")
 	// \n at end of file!
 	return parts[:len(parts)-1]
 }
