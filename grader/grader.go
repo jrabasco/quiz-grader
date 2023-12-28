@@ -137,30 +137,33 @@ func newSection() Section {
 	return Section{[]Answer{}}
 }
 
-func (s Section) normalise(path string) []string {
+func (s Section) normalise(path string, expectedLen int) []string {
 	contents, err := files.ReadFile(path)
 	if err != nil {
 		return []string{}
 	}
 	separators := []string{
 		",", ";", ".", ":", "/",
-		"\\", "|", "||"}
+		"\\", "||", "|"}
 	// try different separators
 	for _, sep := range separators {
 		parts := strings.Split(contents, sep)
-		if len(parts) > 1 {
+		if len(parts) == expectedLen {
 			return parts
 		}
 	}
 	parts := strings.Split(contents, "\n")
-	// \n at end of file!
-	return parts[:len(parts)-1]
+	if len(parts) > expectedLen {
+		// \n at end of file!
+		return parts[:len(parts)-1]
+	}
+	return parts
 }
 
 func (s Section) Grade(path string, player string, section int) int {
-	subs := s.normalise(path)
-	lsubs := len(subs)
 	la := len(s.answers)
+	subs := s.normalise(path, la)
+	lsubs := len(subs)
 	if lsubs != la {
 		fmt.Printf("FLAG! %s in section %d has %d submissions but section requires %d\n", player, section, lsubs, la)
 	}
